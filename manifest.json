@@ -1,0 +1,25 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+    "manifest_version": 3,
+    "name": "Codeforces Freinds Tracker",
+    "version": "1.0",
+    "description": "Get submissions of your friends for a particular Codeforces problem",
+    "content_scripts": [
+        {   
+            "js": ["scripts/content.js", "scripts/popup-script.js"],
+            "matches": ["https://codeforces.com/*"]
+        }
+    ],
+    "icons": {
+        "16": "icon16.png",
+        "32": "icon32.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": ["storage"]
+
+}
