@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CF Friends Tracker</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="App">
+      <section class="content">
+        <img class="graphic" src="image.jpg" alt="Graphic" />
+        <div class="container">
+            <form id="login-form">
+                <label for="UserHandle" class="UserHandle">Add new friend</label><br/>
+                <input type = "text" id="userHandle" name="userHandle" placeholder="Enter friend's user handle" required><br/>
+                <div class="update-button">
+                  <button type="button" id ="button-save">Save</button>
+                  <button type="button" id ="button-clear">Clear All</button>
+                </div>
+            </form> 
+            <p id="errorMessage" class="error-message"></p>
+              <div id="table-container">
+                <table id="table">
+                  <thead>
+                    <tr>
+                      <th>Handles</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-body"></tbody>
+                </table>
+              </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="./scripts/popup-script.js"></script>
+  </body>
+</html>
