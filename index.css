@@ -81,8 +81,11 @@ body {
     border-bottom: 1px solid #ddd;
     text-align: left;
   }
+  td{
+    color: white;
+  }
   th {
-    background-color: #f2f2f2;
+    background-color: #6fdce4;
   }
   
   .delete-button {
@@ -114,6 +117,7 @@ body {
     padding: 10px;
     margin-top: 10px;
   }
+
   
   .Help{
     text-align: center;
@@ -129,3 +133,5 @@ body {
   .heading {
     font-family: 'Courier New', Courier, monospace;
   }
+
+  
