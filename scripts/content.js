@@ -75,7 +75,7 @@ async function init(handles) {
         return lastCharacter;
     }
 
-    const contestNumber = extractIntegersFromString(problemPage);
+    const contestNumber = parseInt(extractIntegersFromString(problemPage));
     const contestProblem = getLastCharacterFromUrl(problemPage);
     
     
@@ -98,12 +98,12 @@ async function init(handles) {
                 throw new Error('Network response was not ok');
             }
             const responseBody = await statusResponse.json();
-            //const submissionsCount = Object.keys(jsonObject).length;
+            const submissionsCount = 10000;
 
             // Process submissions
-            for (let i = 0; i < Object.keys(responseBody).length; i++) {
+            for (let i = 0; i < submissionsCount; i++) {
                 const submissionTime = responseBody.result[i].creationTimeSeconds * 1000;
-                if ((new Date().getTime()) - responseBody.result[i].creationTimeSeconds * 1000 < oneday) {
+                if ((responseBody.result[i].problem.contestId)==contestNumber && ((responseBody.result[i].problem.index).localeCompare(contestProblem))==0) {
                     handleCount++;
 
                     const dateObj = new Date(submissionTime);
@@ -130,6 +130,7 @@ async function init(handles) {
                         </td>
                     `;
                     tableBody.appendChild(tableRowElement);
+                    break;
                 }
             }
         } catch (error) {
