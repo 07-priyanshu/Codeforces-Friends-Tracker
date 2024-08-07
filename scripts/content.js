@@ -118,9 +118,9 @@ async function init(handles) {
                             <a class="${ratingMap.get(rating)}" href="/profile/${handle}">${handle}</a>
                         </td>
                         <td class="${isOdd ? 'dark' : ''}">
-                            <a href="/problemset/problem/${responseBody.result[i].problem.contestId}/${responseBody.result[i].problem.index}">
+                            <a href="https://codeforces.com/contest/${responseBody.result[i].problem.contestId}/submission/${responseBody.result[i].id}">
                                 <div style="display: flex; align-items: center;">
-                                    <span style="flex-grow: 1;">${responseBody.result[i].problem.name}</span>
+                                    <span style="flex-grow: 1;">View Solution</span>
                                     <span>${getEmoji(responseBody.result[i].verdict)}</span>
                                 </div>
                             </a>
