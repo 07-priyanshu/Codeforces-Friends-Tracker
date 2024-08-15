@@ -8,34 +8,6 @@ body {
     max-width: 300px;
     width: 100%;
   }
-  
-  .content {
-    margin: 0 auto;
-    padding: 5px;
-    width: 300px;
-    background-color: #fffb00;
-  }
-  
-  .content h1 {
-    font-size: 25px;
-    margin: 30px 0 15px;
-    text-align: center;
-  }
-  
-  .content p {
-    font-size: 14px;
-    margin: 0;
-    text-align: center;
-  }
-  
-  .content span {
-    display: block;
-    font-size: 10px;
-    margin-top: 15px;
-    text-align: center;
-  }
-  
-  
   body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -134,4 +106,31 @@ body {
     font-family: 'Courier New', Courier, monospace;
   }
 
+  
+  .content {
+    margin: 0 auto;
+    padding: 5px;
+    width: 300px;
+    background-color: #fffb00;
+  }
+  
+  .content h1 {
+    font-size: 25px;
+    margin: 30px 0 15px;
+    text-align: center;
+  }
+  
+  .content p {
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+  }
+  
+  .content span {
+    display: block;
+    font-size: 10px;
+    margin-top: 15px;
+    text-align: center;
+  }
+  
   
