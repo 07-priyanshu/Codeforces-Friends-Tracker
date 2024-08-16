@@ -8,7 +8,7 @@
     "content_scripts": [
         {   
             "js": ["scripts/content.js", "scripts/popup-script.js"],
-            "matches": ["https://codeforces.com/problemset/problem/*"]
+            "matches": ["https://codeforces.com/problemset/problem/*", "https://codeforces.com/contest/*"]
         }
     ],
     
