@@ -1,4 +1,4 @@
-## This is a chrome extension build to track your friends' solutions to a particular codeorces problem from the problemset. Be it your friends or your favourite Grandmasters, use this extension to view their solutions for a codeforces problem.
+## This is a chrome extension build to track your friends' solutions to a particular codeorces problem. Be it your friends or your favourite Grandmasters, use this extension to view their solutions for a codeforces problem.
 
 # Demo Video
 
