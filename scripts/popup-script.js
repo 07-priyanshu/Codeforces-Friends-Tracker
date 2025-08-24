@@ -7,15 +7,24 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Set toggle state
         const toggle = document.getElementById('extension-toggle');
+        const toggleLabel = document.getElementById('toggle-label');
+        
         toggle.checked = extensionEnabled;
+        updateToggleLabel(extensionEnabled);
         
         // Add toggle event listener
         toggle.addEventListener('change', function() {
             chrome.storage.local.set({ 'extensionEnabled': this.checked }, function() {
                 console.log('Extension toggle state saved:', this.checked);
             }.bind(this));
+            updateToggleLabel(this.checked);
         });
     });
+
+    function updateToggleLabel(enabled) {
+        const toggleLabel = document.getElementById('toggle-label');
+        toggleLabel.textContent = enabled ? 'Extension Enabled' : 'Extension Disabled';
+    }
     function renderTable(listValues) {
         const tableBody = document.getElementById('table-body');
         tableBody.innerHTML = '';
