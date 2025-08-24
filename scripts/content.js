@@ -1,4 +1,20 @@
 async function init(handles) {
+    // Check if extension is enabled
+    const extensionState = await new Promise((resolve) => {
+        chrome.storage.local.get('extensionEnabled', (result) => {
+            resolve(result.extensionEnabled !== undefined ? result.extensionEnabled : true);
+        });
+    });
+    
+    if (!extensionState) {
+        // Remove friends table if extension is disabled
+        const existingTable = document.querySelector('#friends-submissions-table');
+        if (existingTable) {
+            existingTable.remove();
+        }
+        return;
+    }
+
     let friendsTableDiv = document.querySelector('#friends-submissions-table');
     if (!friendsTableDiv) {
         friendsTableDiv = document.createElement('div');
@@ -173,12 +189,23 @@ getHandles();
 
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && changes.hasOwnProperty('userHandles')) {
-        const newHandles = changes['userHandles'].newValue;
-        if (newHandles) {
-            init(newHandles);
-        } else {
-            init([]);
+    if (areaName === 'local') {
+        // Handle userHandles changes
+        if (changes.hasOwnProperty('userHandles')) {
+            const newHandles = changes['userHandles'].newValue;
+            if (newHandles) {
+                init(newHandles);
+            } else {
+                init([]);
+            }
+        }
+        
+        // Handle extension toggle changes
+        if (changes.hasOwnProperty('extensionEnabled')) {
+            chrome.storage.local.get('userHandles', function (result) {
+                let userHandles = result.userHandles || [];
+                init(userHandles);
+            });
         }
     }
 });

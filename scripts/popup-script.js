@@ -1,7 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
-    chrome.storage.local.get('userHandles', function (result) {
+    chrome.storage.local.get(['userHandles', 'extensionEnabled'], function (result) {
         let userHandles = result.userHandles || [];
+        let extensionEnabled = result.extensionEnabled !== undefined ? result.extensionEnabled : true;
+        
         renderTable(userHandles);
+        
+        // Set toggle state
+        const toggle = document.getElementById('extension-toggle');
+        toggle.checked = extensionEnabled;
+        
+        // Add toggle event listener
+        toggle.addEventListener('change', function() {
+            chrome.storage.local.set({ 'extensionEnabled': this.checked }, function() {
+                console.log('Extension toggle state saved:', this.checked);
+            }.bind(this));
+        });
     });
     function renderTable(listValues) {
         const tableBody = document.getElementById('table-body');
