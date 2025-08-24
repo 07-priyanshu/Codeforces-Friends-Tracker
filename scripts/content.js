@@ -1,4 +1,20 @@
 async function init(handles) {
+    // Check if extension is enabled
+    const extensionState = await new Promise((resolve) => {
+        chrome.storage.local.get('extensionEnabled', (result) => {
+            resolve(result.extensionEnabled !== undefined ? result.extensionEnabled : true);
+        });
+    });
+    
+    if (!extensionState) {
+        // Remove friends table if extension is disabled
+        const existingTable = document.querySelector('#friends-submissions-table');
+        if (existingTable) {
+            existingTable.remove();
+        }
+        return;
+    }
+
     let friendsTableDiv = document.querySelector('#friends-submissions-table');
     if (!friendsTableDiv) {
         friendsTableDiv = document.createElement('div');
@@ -58,18 +74,23 @@ async function init(handles) {
         }
     }
 
-    function getLastCharacterFromUrl(url) {
+    function getProblemIndexFromUrl(url) {
         // Remove any trailing slashes from the URL
         const cleanedUrl = url.replace(/\/+$/, '');
-    
-        // Get the last character (which should be the problem ID)
-        const lastCharacter = cleanedUrl.charAt(cleanedUrl.length - 1);
-    
-        return lastCharacter;
+
+        const match = cleanedUrl.match(/\/problem\/([A-Z]\d*)/);
+        
+        if (match) {
+            return match[1]; // Return the full problem index (A, B, C1, D2, etc.)
+        }
+        
+        // Fallback: get the last segment after the last slash
+        const lastSegment = cleanedUrl.split('/').pop();
+        return lastSegment;
     }
 
     const contestNumber = parseInt(extractIntegersFromString(problemPage));
-    const contestProblem = getLastCharacterFromUrl(problemPage);
+    const contestProblem = getProblemIndexFromUrl(problemPage);
     let handleCount = 0;
     
     
@@ -94,36 +115,52 @@ async function init(handles) {
             const submissionsCount = 10000;
 
             
+            // Find all submissions for the current problem
+            const problemSubmissions = [];
             for (let i = 0; i < submissionsCount; i++) {
-                const submissionTime = responseBody.result[i].creationTimeSeconds * 1000;
-                if ((responseBody.result[i].problem.contestId)==contestNumber && ((responseBody.result[i].problem.index).localeCompare(contestProblem))==0) {
-                    handleCount++;
-
-                    const dateObj = new Date(submissionTime);
-                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    const formattedTime = `${monthNames[dateObj.getMonth()]}/${dateObj.getDate()}/${dateObj.getFullYear()} ${dateObj.toLocaleTimeString()}<sup title="timezone offset" style="font-size:8px;"> UTC${(dateObj.getTimezoneOffset() / -60).toFixed(1)}</sup>`;
-                    const tableRowElement = document.createElement("tr");
-                    const isOdd = handleCount % 2 !== 0;
-
-                    tableRowElement.innerHTML = `
-                        <td class="left ${isOdd ? 'dark' : ''}">
-                            <a class="${ratingsMap.get(rating)}" href="/profile/${handle}">${handle}</a>
-                        </td>
-                        <td class="${isOdd ? 'dark' : ''}">
-                            <a href="https://codeforces.com/contest/${responseBody.result[i].problem.contestId}/submission/${responseBody.result[i].id}">
-                                <div style="display: flex; align-items: center;">
-                                    <span style="flex-grow: 1;">View Solution</span>
-                                    <span>${getEmoji(responseBody.result[i].verdict)}</span>
-                                </div>
-                            </a>
-                        </td>
-                        <td class="status-small ${isOdd ? 'dark' : ''}">
-                            ${formattedTime}
-                        </td>
-                    `;
-                    tableBody.appendChild(tableRowElement);
-                    break;
+                if (responseBody.result[i] && 
+                    responseBody.result[i].problem.contestId == contestNumber && 
+                    responseBody.result[i].problem.index.localeCompare(contestProblem) == 0) {
+                    problemSubmissions.push(responseBody.result[i]);
                 }
+            }
+
+            if (problemSubmissions.length > 0) {
+                // Find the latest AC submission, or latest submission if no AC
+                let selectedSubmission = problemSubmissions[0]; // Default to latest submission
+                
+                for (let submission of problemSubmissions) {
+                    if (submission.verdict === 'OK') {
+                        selectedSubmission = submission;
+                        break; // Take the latest AC submission (first AC in the list since it's sorted by time desc)
+                    }
+                }
+
+                handleCount++;
+                const submissionTime = selectedSubmission.creationTimeSeconds * 1000;
+                const dateObj = new Date(submissionTime);
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const formattedTime = `${monthNames[dateObj.getMonth()]}/${dateObj.getDate()}/${dateObj.getFullYear()} ${dateObj.toLocaleTimeString()}<sup title="timezone offset" style="font-size:8px;"> UTC${(dateObj.getTimezoneOffset() / -60).toFixed(1)}</sup>`;
+                const tableRowElement = document.createElement("tr");
+                const isOdd = handleCount % 2 !== 0;
+
+                tableRowElement.innerHTML = `
+                    <td class="left ${isOdd ? 'dark' : ''}">
+                        <a class="${ratingsMap.get(rating)}" href="/profile/${handle}">${handle}</a>
+                    </td>
+                    <td class="${isOdd ? 'dark' : ''}">
+                        <a href="https://codeforces.com/contest/${selectedSubmission.problem.contestId}/submission/${selectedSubmission.id}">
+                            <div style="display: flex; align-items: center;">
+                                <span style="flex-grow: 1;">View Solution</span>
+                                <span>${getEmoji(selectedSubmission.verdict)}</span>
+                            </div>
+                        </a>
+                    </td>
+                    <td class="status-small ${isOdd ? 'dark' : ''}">
+                        ${formattedTime}
+                    </td>
+                `;
+                tableBody.appendChild(tableRowElement);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -157,12 +194,23 @@ getHandles();
 
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && changes.hasOwnProperty('userHandles')) {
-        const newHandles = changes['userHandles'].newValue;
-        if (newHandles) {
-            init(newHandles);
-        } else {
-            init([]);
+    if (areaName === 'local') {
+        // Handle userHandles changes
+        if (changes.hasOwnProperty('userHandles')) {
+            const newHandles = changes['userHandles'].newValue;
+            if (newHandles) {
+                init(newHandles);
+            } else {
+                init([]);
+            }
+        }
+        
+        // Handle extension toggle changes
+        if (changes.hasOwnProperty('extensionEnabled')) {
+            chrome.storage.local.get('userHandles', function (result) {
+                let userHandles = result.userHandles || [];
+                init(userHandles);
+            });
         }
     }
 });
