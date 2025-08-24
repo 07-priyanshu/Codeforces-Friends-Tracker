@@ -74,18 +74,25 @@ async function init(handles) {
         }
     }
 
-    function getLastCharacterFromUrl(url) {
+    function getProblemIndexFromUrl(url) {
         // Remove any trailing slashes from the URL
         const cleanedUrl = url.replace(/\/+$/, '');
     
-        // Get the last character (which should be the problem ID)
-        const lastCharacter = cleanedUrl.charAt(cleanedUrl.length - 1);
-    
-        return lastCharacter;
+        // Extract the problem index (e.g., A, B, C1, D2) from the URL
+        // URL format: https://codeforces.com/contest/123/problem/A or /problemset/problem/123/C1
+        const match = cleanedUrl.match(/\/problem\/([A-Z]\d*)/);
+        
+        if (match) {
+            return match[1]; // Return the full problem index (A, B, C1, D2, etc.)
+        }
+        
+        // Fallback: get the last segment after the last slash
+        const lastSegment = cleanedUrl.split('/').pop();
+        return lastSegment;
     }
 
     const contestNumber = parseInt(extractIntegersFromString(problemPage));
-    const contestProblem = getLastCharacterFromUrl(problemPage);
+    const contestProblem = getProblemIndexFromUrl(problemPage);
     let handleCount = 0;
     
     

@@ -68,11 +68,12 @@ body {
   
   .update-button{
     display: flex;
+    align-items: center;
+    gap: 10px;
   }
   .update-button button{
     background-color: #4caf50;
     color: white;
-    margin-right: 10px;
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
@@ -133,26 +134,11 @@ body {
   }
   
   /* Toggle Switch Styles */
-  .toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 15px 0;
-    padding: 10px 0;
-  }
-
-  .toggle-label {
-    color: white;
-    font-family: "Arial Rounded MT Bold", Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    margin: 0;
-  }
-
   .switch {
     position: relative;
     display: inline-block;
     width: 60px;
-    height: 28px;
+    height: 42px;
   }
 
   .switch input {
@@ -170,19 +156,36 @@ body {
     bottom: 0;
     background-color: #ccc;
     transition: .4s;
-    border-radius: 28px;
+    border-radius: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .slider:before {
     position: absolute;
     content: "";
-    height: 20px;
-    width: 20px;
+    height: 34px;
+    width: 34px;
     left: 4px;
     bottom: 4px;
     background-color: white;
     transition: .4s;
     border-radius: 50%;
+    z-index: 2;
+  }
+
+  .slider-text {
+    position: absolute;
+    color: white;
+    font-family: "Arial Rounded MT Bold", Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 1;
+    transition: .4s;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
   }
 
   input:checked + .slider {
@@ -190,7 +193,15 @@ body {
   }
 
   input:checked + .slider:before {
-    transform: translateX(32px);
+    transform: translateX(18px);
+  }
+
+  input:checked + .slider .slider-text {
+    content: "ON";
+  }
+
+  input:not(:checked) + .slider .slider-text {
+    content: "OFF";
   }
   
   
